@@ -1,0 +1,5 @@
+.DS_Store
+bundle/
+bundle_src/
+*.tar
+check_anonymity.sh
