@@ -19,7 +19,7 @@ HERE = Path(__file__).resolve().parent
 CH_COLORS = ["#2a6fdb", "#2bb673", "#f28c28", "#b04ddb"]
 CH_NAMES = ["A", "B", "C", "D"]
 
-TITLE = "Chorus: Multi-Speaker Conversational Speech Generation with Communicating Single-Speaker TTS Models"
+TITLE = "Chorus: Extending Single-Speaker TTS to Multi-Speaker Conversation Generation"
 
 CSS = """
 :root{--ink:#1c1f24;--muted:#5c6470;--line:#e3e6ea;--bg:#fbfbfc;--card:#ffffff;--accent:#2a6fdb;--hl:rgba(255,196,0,.35)}
@@ -219,7 +219,7 @@ class Builder:
     def sec_grid(self):
         S = self.man["sections"]["zv_grid"]
         h = ['<h2 id="two-speaker">1. Two-speaker conversation (ZipVoice-Dialog test set)</h2>']
-        h.append('<p class="lead">Every system generates the same conversations from the same transcript and the same prompt recordings. Systems with one channel per speaker also have a per-channel view and an activity strip. The other systems generate a single-channel mixture only. This is the setting of Table 1 in the paper.</p>')
+        h.append('<p class="lead">Every system generates the same conversations from the same transcript and the same prompt recordings. Systems with one channel per speaker also have a per-channel view and an activity strip. The other systems generate a single-channel mixture only.</p>')
         h.append(self.legend())
         for i, it in enumerate(S["items"]):
             h.append(f'<div class="card"><h3>Conversation {i+1}</h3>')
@@ -259,7 +259,7 @@ class Builder:
     def sec_interaction(self):
         S = self.man["sections"]["interaction"]
         h = ['<h2 id="interaction">2. Speaker interaction (backchannels, interruptions and overlaps)</h2>']
-        h.append('<p class="lead">Chorus generates one channel per speaker in turn-order mode, so the text input carries only the turn order and the model decides all timing, including every overlap. The clips below are Chorus outputs on the ZipVoice-Dialog test set. The events were found automatically with the event labeler of the turn-taking judge of Talking Turns, which uses the VAD of pyannote on each channel and a lexical backchannel detector. They were not picked by hand. The highlighted interval is the detected event. The ground truth of the same transcript is shown for reference. This is the setting of Tables 2 and 3 in the paper.</p>')
+        h.append('<p class="lead">Chorus generates one channel per speaker in turn-order mode, so the text input carries only the turn order and the model decides all timing, including every overlap. The clips below are Chorus outputs on the ZipVoice-Dialog test set. The events were found automatically with the event labeler of the turn-taking judge of Talking Turns, which uses the VAD of pyannote on each channel and a lexical backchannel detector. They were not picked by hand. The highlighted interval is the detected event. The ground truth of the same transcript is shown for reference.</p>')
         h.append(self.legend())
         kinds = {"backchannel": ("bc", "Backchannel"), "interruption": ("in", "Interruption"), "overlap": ("ov", "Sustained overlap")}
         for i, it in enumerate(S["items"]):
@@ -292,7 +292,7 @@ class Builder:
         C = self.man["sections"]["control_cc2"]
         Sd = self.man["sections"]["control_sssd"]
         h = ['<h2 id="control">3. Timestamp mode</h2>']
-        h.append('<p class="lead">Chorus has two modes for turn timing. In <b>turn-order mode</b>, the text input carries only the turn order and the model decides the timing. In <b>timestamp mode</b>, the text input also gives the start and end of every turn. The given turn timestamps are drawn in outline, so the activity strip shows how closely the generated speech follows them. Both rows come from the same model. This is the setting of Table 7 in the paper.</p>')
+        h.append('<p class="lead">Chorus has two modes for turn timing. In <b>turn-order mode</b>, the text input carries only the turn order and the model decides the timing. In <b>timestamp mode</b>, the text input also gives the start and end of every turn. The given turn timestamps are drawn in outline, so the activity strip shows how closely the generated speech follows them. Both rows come from the same model.</p>')
         h.append(self.legend())
         h.append('<h3>3a. Scripted conversations (CoVoMix2 test set). The turn timestamps place the turns in order with a fixed 0.4 s gap.</h3>')
         for i, it in enumerate(C["items"]):
@@ -331,7 +331,7 @@ class Builder:
     def sec_editing(self):
         S = self.man["sections"]["editing"]
         h = ['<h2 id="editing">4. Response generation</h2>']
-        h.append('<p class="lead">One channel of a ground-truth conversation is given as its recording, and Chorus generates the channel of the other speaker from the transcript in turn-order mode. No timing is given, so the model decides when to start, when to backchannel and when to overlap. Both directions are shown, together with all-speaker generation of the same conversation. This is the setting of Table 8 in the paper.</p>')
+        h.append('<p class="lead">One channel of a ground-truth conversation is given as its recording, and Chorus generates the channel of the other speaker from the transcript in turn-order mode. No timing is given, so the model decides when to start, when to backchannel and when to overlap. Both directions are shown, together with all-speaker generation of the same conversation.</p>')
         h.append(self.legend())
         for i, it in enumerate(S["items"]):
             h.append(f'<div class="card"><h3>Conversation {i+1}</h3>')
@@ -363,7 +363,7 @@ class Builder:
     def sec_ami(self):
         S = self.man["sections"]["ami"]
         h = ['<h2 id="multi">5. More than two speakers (AMI test set)</h2>']
-        h.append('<p class="lead">The same model runs with two, three or four copies, one channel per speaker. The transcripts and turn order come from the AMI test set. The prompt recordings are LibriTTS speakers, so the original meeting audio is not comparable and is not shown. This is the setting of Table 5 in the paper.</p>')
+        h.append('<p class="lead">The same model runs with two, three or four copies, one channel per speaker. The transcripts and turn order come from the AMI test set. The prompt recordings are LibriTTS speakers, so the original meeting audio is not comparable and is not shown.</p>')
         h.append(self.legend())
         byK = {}
         for it in S["items"]:
@@ -386,7 +386,7 @@ class Builder:
         return f"""
 <h1>{esc(TITLE)}</h1>
 <p class="sub">Audio samples. Anonymous supplementary material. These samples are for ICLR submission only.</p>
-<p class="lead">Chorus duplicates a pretrained single-speaker TTS model, one copy per speaker, and lets the copies communicate through Transform-Average-Concatenate (TAC) blocks. Each copy generates one audio channel for its speaker. The average step of TAC is invariant to the number of speakers, so the number of speakers is chosen at inference.</p>
+<p class="lead">Chorus assigns a weight-shared single-speaker TTS model to each speaker and connects the models through a communication block whose computation does not depend on the number of speakers, so the number of speakers is chosen at inference time. Each model generates one audio channel for its speaker. Chorus keeps the infilling objective of its base model, F5-TTS: each model receives the audio of its channel, a mask over the frames to generate, and a text input in which special tokens mark the turns of that speaker. Choosing which frames are masked and how the transcript is structured gives the settings below: generation of all channels from a transcript, generation of one channel given the recorded audio of the other speaker (response generation), and generation with turn timing given either by explicit start and end times (timestamp mode) or by the turn order alone (turn-order mode).</p>
 <img class="fig" src="assets/architecture.png" alt="(a) Chorus with two weight-shared single-speaker TTS models, one channel per speaker, joined by a TAC block after every DiT block; (b) the TAC block: transform, average over speakers, concatenate, gated residual">
 <div class="note"><b>Listening notes.</b> Chorus generates one channel per speaker. <b>Mix</b> is the sum of the channels, the single-channel mixture that the paper evaluates. The speaker buttons play one channel alone. The activity strips show where each channel contains speech, computed with the voice activity detection (VAD) of pyannote. Audio is 24 kHz WAV. Headphones recommended.</div>
 <p class="sub">Contents: <a href="#two-speaker">1. Two-speaker conversation</a> · <a href="#interaction">2. Speaker interaction</a> · <a href="#control">3. Timestamp mode</a> · <a href="#editing">4. Response generation</a> · <a href="#multi">5. More than two speakers</a></p>
